@@ -1,0 +1,21 @@
+{% extends 'django_bootstrap5/bootstrap5.html' %}
+
+{% block bootstrap5_title %}{% block title %}{% endblock %}{% endblock %}
+
+{% load django_bootstrap5 %}
+
+{% block bootstrap5_content %}
+
+
+<div class="container">
+
+    {% include 'books/includes/navbar.html' %}
+
+
+    {% autoescape off %}{% bootstrap_messages %}{% endautoescape %}
+
+    {% block content %}
+
+    {% endblock %}
+</div>
+{% endblock %}

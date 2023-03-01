@@ -1,0 +1,9 @@
+celery[redis]
+boto3
+Django
+django-bootstrap5
+requests
+pytest-django
+pytest-mock
+pytest-freezegun
+black

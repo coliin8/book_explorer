@@ -1,0 +1,33 @@
+{% extends "books/header.html" %}
+
+{% load django_bootstrap5 %}
+
+{% block content %}
+
+<div class="row" id="webpage-body">
+
+    <article class="col" id="main-content">
+        <h2 class="my-4">Current Book list Files</h2>
+        <table class="table table-striped table-hover">
+            {% for book_file in page_obj %}
+            <tr>
+                <td><a href="{% url 'books:detail' book_file.id %}">{{ book_file }}</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% bootstrap_pagination page_obj url="?page=1&flop=flip" extra="q=foo" size="sm" %}
+    </article>
+
+    <aside class="col-sm-4">
+
+        <h2 class="my-4">Add a new book list</h2>
+        <form method="post" enctype="multipart/form-data" action={% url 'books:upload' %}>
+            {% csrf_token %}
+            <input type="file" name="upload" accept=".csv"><br><br>
+
+            {% bootstrap_button button_type="submit" content="OK" %}
+            {% bootstrap_button button_type="reset" content="Cancel" button_class="btn-secondary" %}
+        </form>
+    </aside>
+</div>
+{% endblock %}

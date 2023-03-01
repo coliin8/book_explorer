@@ -11,6 +11,14 @@ from botocore.client import ClientError
 from . import models
 
 
+class CsvFileExistsError(Exception):
+    pass
+
+
+class CsvFileValidationError(Exception):
+    pass
+
+
 class UploadFileManagerInterface(metaclass=abc.ABCMeta):
     @classmethod
     def __subclasshook__(cls, subclass):
@@ -29,19 +37,38 @@ class UploadFileManagerInterface(metaclass=abc.ABCMeta):
         lines = file.read().decode("utf-8").splitlines(True)
         return csv.DictReader(lines)
 
-    def _generate_md5_checksum(self, file: IO) -> str:
+    def _generate_check_md5_checksum(self, file: IO) -> str:
+        """Create MD5 Checksum of File Object and check it doesn't exist already.
+
+        If it does exist then Throw error
+
+        Args:
+            file (IO): File like objecy of upload CSV
+
+        Returns:
+            str: md5 hexgist
+
+        Raises:
+            CsvFileExistsError: Existing File exists
+        """
         file.seek(0)
         md5 = hashlib.md5()
         # handle content in binary form
         while chunk := file.read(4096):
             md5.update(chunk)
-        return md5.hexdigest()
+        md5_checksum = md5.hexdigest()
+
+        if models.BookFile.objects.filter(md5_checksum=md5_checksum).exists():
+            raise CsvFileExistsError(f"{file.name} alreadly been upload to system.")
+
+        return md5_checksum
 
     def csv_file_object_to_dict(self, file: IO) -> Dict[str, List[Dict[str, Any]]]:
         reader = self._create_csv_reader_from_file_object(file)
         output = {"rows": []}
+        fields = sorted(reader.fieldnames)
         for row in reader:
-            output["rows"].append({header: row[header] for header in self.CSV_HEADERS})
+            output["rows"].append({header: row[header] for header in fields})
         return output
 
     @abc.abstractmethod
@@ -62,11 +89,11 @@ class S3UploadFileManager(UploadFileManagerInterface):
     """
 
     CSV_HEADERS = [
-        "Book Author",
-        "Book title",
-        "Date published",
-        "Publisher name",
-        "Unique identifer",
+        "BOOK AUTHOR",
+        "BOOK TITLE",
+        "DATE PUBLISHED",
+        "PUBLISHER NAME",
+        "UNIQUE IDENTIFER",
     ]
 
     def __init__(
@@ -89,23 +116,17 @@ class S3UploadFileManager(UploadFileManagerInterface):
     def _contruct_s3_url(self, file_name: str) -> str:
         return f"https://{self.s3_bucket_name}.s3.{self.aws_region_name}.amazonaws.com/{file_name}"
 
-    def _validate_csv_file(self, file) -> Tuple[bool, str | None]:
+    def _validate_csv_file(self, file):
         file.seek(0)
         reader = self._create_csv_reader_from_file_object(file)
-        if sorted(reader.fieldnames) != self.CSV_HEADERS:
-            return (
-                False,
+        fieldnames = sorted(list(map(lambda x: x.upper(), reader.fieldnames)))
+        if self.CSV_HEADERS != fieldnames:
+            raise CsvFileValidationError(
                 f"CSV Column Headers were {sorted(reader.fieldnames)} and should be {self.CSV_HEADERS}!",
             )
-        for row in reader:
-            pass
-        return (
-            True,
-            None,
-        )
 
     def upload(self, file: IO) -> models.BookFile:
-        md5 = self._generate_md5_checksum(file)
+        md5 = self._generate_check_md5_checksum(file)
         file_name = self._generate_file_name()
         self._validate_csv_file(file)
         file.seek(0)

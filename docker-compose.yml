@@ -1,0 +1,47 @@
+version: '3.7'
+
+services:
+  web:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/book_explorer
+    ports:
+      - 8000:8000
+    environment:
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+      AWS_ACCESS_KEY_ID: AKIAX2FCJMOZSZ67R6AF
+      AWS_SECRET_ACCESS_KEY: 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
+    depends_on:
+      - redis
+  redis:
+    restart: unless-stopped
+    image: redis:7.0.5-alpine
+    expose:
+      - 6379
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery --app book_explorer  worker -l info
+    volumes:
+      - .:/book_explorer
+    environment:
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+    depends_on:
+      - web
+      - redis
+  flower:
+    image: mher/flower
+    environment:
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+    ports:
+      - 5555:5555
+    depends_on:
+      - redis

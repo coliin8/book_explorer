@@ -101,10 +101,7 @@ def test_upload_failure_as_file_already_exists(
     with pytest.raises(CsvFileExistsError) as excinfo:
         subject.upload(csv_file_like_object)
     # Assertions
-    assert (
-        str(excinfo.value)
-        == "books/tests/resources/book-success.csv alreadly been upload to system."
-    )
+    assert str(excinfo.value) == "File already been upload to system."
 
 
 @pytest.mark.freeze_time("2023-02-07")

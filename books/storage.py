@@ -59,7 +59,7 @@ class UploadFileManagerInterface(metaclass=abc.ABCMeta):
         md5_checksum = md5.hexdigest()
 
         if models.BookFile.objects.filter(md5_checksum=md5_checksum).exists():
-            raise CsvFileExistsError(f"{file.name} alreadly been upload to system.")
+            raise CsvFileExistsError("File already been upload to system.")
 
         return md5_checksum
 

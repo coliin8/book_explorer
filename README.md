@@ -1,4 +1,4 @@
-# Setup and Run Application
+# Setup and Run Application Locally
 
 1. Install Python 3.10.4.
 2. Install Redis and start it using `redis-server` use default port of 6379
@@ -14,10 +14,25 @@
 7. Setup Environmental Variables
    1. AWS_ACCESS_KEY_ID=Your_Key_id
    2. AWS_SECRET_ACCESS_KEY=Your_Secret_Token
-8. Run `pyt
-9. hon manage.py migrate` to run migration and generate database
-10. Run `python manage.py runserver`
-11. Run `celery --app book_explorer  worker -l info`
+8. Run `python manage.py migrate` to run migration and generate database
+9.  Run `python manage.py runserver`
+10. Run `celery --app book_explorer  worker -l info`
+
+# Run in Docker
+   
+   0. Assume you have checked out repo from git
+   1. `cd book_explorer`
+   2. Open docker-compose.yml file
+      1. Update Environment Variables with your details:
+         1. AWS_ACCESS_KEY_ID
+         2. AWS_SECRET_ACCESS_KEY
+   3. `docker-compose up -d`
+      1. Web App on http://localhost:8000/books
+      2. Flower on http://localhost:5555
+      3. Redis exposed on redis://localhost:6379
+   
+
+
 
 # Run Tests
 

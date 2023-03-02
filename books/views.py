@@ -88,10 +88,10 @@ def upload_file_to_cloud(upload: IO) -> Tuple[bool, str | None, BookFile | None]
     try:
         db_book_file = manager.upload(upload)
     except (CsvFileExistsError, CsvFileValidationError) as e:
-        message = f"Failed to upload {db_book_file} due to validation - {e}."
+        message = f"Failed to upload {upload.name} due to validation - {e}."
         is_success = False
     except Exception as e:
-        message = f"Failed Unexpectedly to Upload {db_book_file} -{e}."
+        message = f"Failed Unexpectedly to Upload {upload.name} - {e}."
         is_success = False
     return (
         is_success,

@@ -3,6 +3,13 @@ import pytest
 
 from books.models import BookFile
 
+# pytest_plugins = ("celery.contrib.pytest",)
+
+
+# @pytest.fixture(scope="session")
+# def celery_config():
+#     return {"broker_url": "memory://", "result_backend": "rpc://"}
+
 
 @pytest.fixture
 def create_bookfile():
@@ -14,3 +21,19 @@ def create_bookfile():
     )
     book_file.save()
     return book_file
+
+
+@pytest.fixture
+def csv_file_like_object():
+    # The above code takes string and converts it into the byte equivalent using encode()
+    # so that it can be accepted by the hash function
+    with open("books/tests/resources/book-success.csv", "rb") as f:
+        yield f
+
+
+@pytest.fixture
+def csv_file_like_object_validation_errors():
+    # The above code takes string and converts it into the byte equivalent using encode()
+    # so that it can be accepted by the hash function
+    with open("books/tests/resources/book-failure.csv", "rb") as f:
+        yield f

@@ -14,8 +14,8 @@ services:
     environment:
       CELERY_BROKER_URL: "redis://redis:6379/0"
       CELERY_RESULT_BACKEND: "redis://redis:6379/0"
-      AWS_ACCESS_KEY_ID: AKIAX2FCJMOZT3SY3NW3
-      AWS_SECRET_ACCESS_KEY: fRLA9kRSMRAaJfyEbkj3153iKsLrdJfugqPmHmfk
+      AWS_ACCESS_KEY_ID: add_yours
+      AWS_SECRET_ACCESS_KEY: add_yours
     depends_on:
       - redis
   redis:
@@ -33,8 +33,8 @@ services:
     environment:
       CELERY_BROKER_URL: "redis://redis:6379/0"
       CELERY_RESULT_BACKEND: "redis://redis:6379/0"
-      AWS_ACCESS_KEY_ID: AKIAX2FCJMOZT3SY3NW3
-      AWS_SECRET_ACCESS_KEY: fRLA9kRSMRAaJfyEbkj3153iKsLrdJfugqPmHmfk
+      AWS_ACCESS_KEY_ID: add_yours
+      AWS_SECRET_ACCESS_KEY: add_yours
     depends_on:
       - web
       - redis
